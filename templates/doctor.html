@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Page</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .search-container {
+            justify-content: center;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        #resultTable {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+</head>
+
+<body>
+
+        <div class="search-container">
+            <h1>Search Page</h1>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button">Search</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <table class="table" id="resultTable">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+      <!-- Table rows will be dynamically added here -->
+            </tbody>
+            </table>
+        </div>
+
+        <script>
+            function performSearch() {
+                // Get the search input value
+                var searchValue = document.getElementById('searchInput').value;
+
+                // Simulate a search result (replace this with your actual search logic)
+                var searchResult = [
+                { id: 1, result: 'Result 1' },
+                { id: 2, result: 'Result 2' },
+                { id: 3, result: 'Result 3' }
+                ];
+
+                // Update the table with search results
+                updateTable(searchResult);
+            }
+
+            function updateTable(results) {
+                var tableBody = document.querySelector('#resultTable tbody');
+                tableBody.innerHTML = ''; // Clear existing rows
+
+                // Add new rows based on search results
+                results.forEach(function (result) {
+                    var row = '<tr><th scope="row">' + result.id + '</th><td>' + result.result + '</td></tr>';
+                    tableBody.innerHTML += row;
+                });
+
+                // Display the table
+                document.getElementById('resultTable').style.display = 'table';
+            }
+</script>
+
+
+
+        <!--<script>
+            const msgerForm = get(".msger-inputarea");
+            const msgerInput = get(".msger-input");
+            const msgerChat = get(".msger-chat");
+
+            msgerForm.addEventListener("submit", event => {
+                event.preventDefault();
+
+                const msgText = msgerInput.value;
+                if (!msgText) return;
+
+
+                msgerInput.value = "";
+                console.log(msgText)
+                botResponse(msgText);
+            });
+
+
+
+            function getBookingDetails(){
+
+            }
+
+           function appendMessage(text) {
+            //   Simple solution for small apps
+                const msgHTML = `
+
+                    <div class="msg-text">${text}</div>
+                `;
+            }
+
+            function botResponse(rawText) {
+
+                // Bot Response
+                $.get("/get_booking_details", { msg: rawText }).done(function (data) {
+                console.log(rawText);
+                console.log(data);
+                const msgText = data;
+                appendMessage(msgText);
+
+                });
+
+            }
+
+            // Utils
+            function get(selector, root = document) {
+                return root.querySelector(selector);
+            }-->
+
+        </script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+
+</html>

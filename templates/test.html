@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+
+  <title>Centered Search Bar</title>
+  <style>
+    body {
+      display: flex;
+      align-items: ;
+      justify-content: center;
+      height: 100vh;
+      margin: 100px;
+    }
+
+    .search-container {
+      max-width: 800px;
+      width: 100%;
+      text-align: center;
+    }
+    .table {
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+    #resultTable {
+      display: none;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+<div class = "container text-center">
+  <div class="row justify-content-md-center align-items-start">
+    <div class="search-container">
+      <h1>Search Page</h1>
+      <div class="input-group mb-3">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search..." aria-label="Search" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+        <button class="btn btn-outline-secondary" type="button" onclick="sendData()">Search</button>
+        </div>
+          <div id="response"></div>
+      </div>
+    </div>
+  </div>
+  <div class="row justify-content-md-center">
+    <table class="table" id="resultTable">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Result</th>
+                </tr>
+            </thead>
+            <tbody>
+      <!-- Table rows will be dynamically added here -->
+            </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+        function sendData() {
+            const dataInput = document.getElementById('searchInput').value;
+
+            fetch('/process_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ data: dataInput }),
+            })
+            .then(response => response.json())
+            .then(data => updateTable(data.message))
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+
+
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+<script>
+
+  function updateTable(results) {
+    var tableBody = document.querySelector('#resultTable tbody');
+    tableBody.innerHTML = ''; // Clear existing rows
+    console.log(results)
+
+    // Add new rows based on search results
+    //results.forEach(function (result) {
+    //  var row = '<tr><th scope="row">' + result.id + '</th><td>' + result.result + '</td></tr>';
+    //  tableBody.innerHTML += row;
+    //});
+
+
+    // Display the table
+    document.getElementById('resultTable').style.display = 'table';
+  }
+</script>
+
+
+</body>
+</html>
