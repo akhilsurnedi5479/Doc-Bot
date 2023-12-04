@@ -744,7 +744,7 @@ def get_bot_response():
         if s.lower() == "yes":
             session['step'] = "SCHEDULE_SENT_TO_USER"
             schedule_available = get_available_schedule()
-            get_available_schedule()
+            #get_available_schedule()
             return "the available timings are:......Select the one you meant...select '0'"
         else:
             session['step'] = 'FINAL'
@@ -760,7 +760,7 @@ def get_bot_response():
             patient_gender = session["gender"]
             booking_timing = "wednesday: 1:00 PM - 5:00 PM"
             booking_id = make_a_booking(doctor_id, patient_name, patient_email, patient_age,patient_gender,booking_timing)
-        return "Your booking has been made. Please note your booking id"+booking_id
+        return "Your booking has been made. Please note your booking id"+str(booking_id)
 
 
     # #Code change END
