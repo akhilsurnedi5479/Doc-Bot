@@ -1,0 +1,31 @@
+{
+    "doctors": [
+        {
+            "id": 1,
+            "name": "Dr. John Smith",
+            "schedule": {
+                "monday": "9:00 AM - 5:00 PM",
+                "tuesday": "10:00 AM - 6:00 PM",
+                "wednesday": "9:00 AM - 1:00 PM"
+            }
+        },
+        {
+            "id": 2,
+            "name": "Dr. Emily Johnson",
+            "schedule": {
+                "monday": "8:00 AM - 4:00 PM",
+                "wednesday": "1:00 PM - 5:00 PM",
+                "thursday": "9:00 AM - 3:00 PM"
+            }
+        },
+        {
+            "id": 3,
+            "name": "Dr. Michael Davis",
+            "schedule": {
+                "tuesday": "9:00 AM - 12:00 PM",
+                "thursday": "2:00 PM - 7:00 PM",
+                "friday": "10:00 AM - 4:00 PM"
+            }
+        }
+    ]
+}

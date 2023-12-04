@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
 
-  <title>Centered Search Bar</title>
+  <title>Doctor Dashboard</title>
   <style>
     body {
       display: flex;
@@ -72,7 +72,7 @@
                 body: JSON.stringify({ data: dataInput }),
             })
             .then(response => response.json())
-            .then(data => updateTable(data.message))
+            .then(data => updateTable(data))
             .catch(error => {
                 console.error('Error:', error);
             });

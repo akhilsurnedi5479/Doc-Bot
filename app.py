@@ -8,6 +8,8 @@ from spacy.lang.en.stop_words import STOP_WORDS
 import spacy
 import joblib
 from flask import Flask, render_template, jsonify, request, session
+import json
+import uuid
 
 app = Flask(__name__)
 
@@ -320,28 +322,111 @@ def related_sym(psym1):
     else:
         return 0
 
+@app.route("/get_booking_details")
+def get_booking_details():
+    id = request.args.get('msg')
+    booking_details = get_booking_by_id(id)
+    return "testing dthe flow from py to html ---  "+id
+
+def generate_numeric_id():
+    # Generate a random 8-digit number
+    return uuid.uuid4().int % 100000000
+
+def make_a_booking(doctor_id, patient_name, patient_email, patient_age, patient_gender, booking_timing):
+    # Generate an 8-digit numeric booking ID
+    booking_id = generate_numeric_id()
+
+    # Read doctors data from doctors.json
+    with open('data/doctors.json', 'r') as file:
+        doctors_data = json.load(file)
+
+    # Find the doctor with the specified ID
+    doctor_found = False
+    for doctor in doctors_data['doctors']:
+        if doctor['id'] == doctor_id:
+            doctor_name = doctor["name"]
+            doctor_found = True
+            # Extract available timings from the doctor's schedule
+            available_timings = doctor['schedule']
+            print(available_timings)
+            # Remove the booked timing from available timings
+            available_timings.pop(booking_timing.split()[0].lower(), None)
+            # Update the doctor's schedule
+            doctor['schedule'] = available_timings
+            print(available_timings)
+            break
+
+    # If the doctor was not found, return None
+    if not doctor_found:
+        return None
+
+    # Create a dictionary for the booking
+    booking_data = {
+        "booking_id": booking_id,
+        "doctor_name": doctor_name,
+        "patient_name": patient_name,
+        "patient_email": patient_email,
+        "patient_age": patient_age,
+        "patient_gender": patient_gender,
+        "booking_timing": booking_timing
+    }
+
+    # Read existing bookings from the JSON file
+    try:
+        with open('data/bookings.json', 'r') as file:
+            bookings = json.load(file)
+    except FileNotFoundError:
+        # If the file doesn't exist yet, create an empty list
+        bookings = []
+
+    # Add the new booking to the list of bookings
+    bookings.append(booking_data)
+
+    # Write the updated list of bookings back to the JSON file
+    with open('data/bookings.json', 'w') as file:
+        json.dump(bookings, file, indent=4)
+
+    # Write the updated doctors data back to doctors.json
+    with open('data/doctors.json', 'w') as file:
+        json.dump(doctors_data, file, indent=4)
+
+    return booking_id
+
+def get_booking_by_id(booking_id):
+    try:
+        with open('data/bookings.json', 'r') as file:
+            bookings = json.load(file)
+            for booking in bookings:
+                if booking['booking_id'] == booking_id:
+                    return booking
+    except FileNotFoundError:
+        print("Error: The 'bookings.json' file was not found.")
+    return None
+
+def get_available_schedule():
+    return 0
+
+
 @app.route('/process_data', methods=['POST'])
 def process_data():
     data_from_frontend = request.get_json()
     # Process the data in Python
     processed_data = {'message': f"Received from frontend: {data_from_frontend['data']}"}
-    #get_booking_details_from_DB(bookingID)
-    searchResult = {'id': 1, 'message': 'Result 123'}
+    # get_booking_details_from_DB(bookingID)
+
+    searchResult = get_booking_by_id(int(data_from_frontend['data']))
+    print(searchResult)
     return jsonify(searchResult)
+
 
 @app.route("/test")
 def get_booking():
     return render_template("test.html")
 
+
 @app.route("/")
 def home():
     return render_template("home.html")
-
-@app.route("/get_booking_details")
-def get_booking_details():
-    id = request.args.get('msg')
-    return "testing the flow from py to html ---  "+id
-
 
 @app.route("/get")
 def get_bot_response():
@@ -363,8 +448,13 @@ def get_bot_response():
         return "What is your name ?"
     if 'name' not in session and 'step' not in session:
         session['name'] = s
-        session['step'] = "age"
+        session['step'] = "email"
+        return "Please enter your email ID"
+    if session["step"] == "email":
+        session["email"] = s
+        session["step"]  = "age"
         return "How old are you? "
+
     if session["step"] == "age":
         session["age"] = int(s)
         session["step"] = "gender"
@@ -653,6 +743,8 @@ def get_bot_response():
         #session['step'] = 'FINAL'
         if s.lower() == "yes":
             session['step'] = "SCHEDULE_SENT_TO_USER"
+            schedule_available = get_available_schedule()
+            get_available_schedule()
             return "the available timings are:......Select the one you meant...select '0'"
         else:
             session['step'] = 'FINAL'
@@ -661,7 +753,14 @@ def get_bot_response():
         session['step'] = 'FINAL'
         if(int(s) == 0):
         #make a booking for schedule 0
-            return "Your booking has been made."
+            doctor_id = 1
+            patient_name = session["name"]
+            patient_email = session["email"]
+            patient_age = session["age"]
+            patient_gender = session["gender"]
+            booking_timing = "wednesday: 1:00 PM - 5:00 PM"
+            booking_id = make_a_booking(doctor_id, patient_name, patient_email, patient_age,patient_gender,booking_timing)
+        return "Your booking has been made. Please note your booking id"+booking_id
 
 
     # #Code change END
@@ -672,9 +771,11 @@ def get_bot_response():
         name = session["name"]
         age = session["age"]
         gender = session["gender"]
+        email = session["email"]
         session.clear()
         if s.lower() == "yes":
             session["gender"] = gender
+            session["email"] = email
             session["name"] = name
             session["age"] = age
             session['step'] = "FS"
