@@ -2,13 +2,11 @@
   "name": "Dr. John Smith",
   "schedule": {
     "monday": [
-      "9:30 AM",
       "11:00 AM",
       "12:00 AM",
       "1:00 PM"
     ],
     "tuesday": [
-      "11:00 AM",
       "12:00 AM",
       "1:00 AM",
       "2:00 AM",

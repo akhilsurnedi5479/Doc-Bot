@@ -6,6 +6,7 @@
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
 
   <title>Doctor Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="/static/styles/Bot.png">
   <style>
     body {
       display: flex;
@@ -35,7 +36,7 @@
 <div class = "container text-center">
   <div class="row justify-content-md-center align-items-start">
     <div class="search-container">
-      <h1>Search Page</h1>
+      <h1>Doctor Dashboard</h1>
       <div class="input-group mb-3">
         <input type="text" class="form-control" id="searchInput" placeholder="Search..." aria-label="Search" aria-describedby="basic-addon2">
         <div class="input-group-append">
@@ -46,17 +47,14 @@
     </div>
   </div>
   <div class="row justify-content-md-center">
-    <table class="table" id="resultTable">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Result</th>
-                </tr>
-            </thead>
-            <tbody>
-      <!-- Table rows will be dynamically added here -->
-            </tbody>
-    </table>
+    <div class="card" id="appointmentDetailsCard" style="display:none;">
+            <div class="card-header">
+                <h5 class="card-title">Appointment Details</h5>
+            </div>
+            <div class="card-body" id="appointmentDetails">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </div>
   </div>
 </div>
 
@@ -72,7 +70,7 @@
                 body: JSON.stringify({ data: dataInput }),
             })
             .then(response => response.json())
-            .then(data => updateTable(data))
+            .then(data => updateAppointmentDetails(data))
             .catch(error => {
                 console.error('Error:', error);
             });
@@ -86,22 +84,44 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
 <script>
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+  // Function to update the card content based on the search result
+  function updateAppointmentDetails(results) {
+            const appointmentDetails = document.getElementById("appointmentDetails");
+            appointment = results;
+            appointmentDetails.innerHTML = ""; // Clear previous content
 
-  function updateTable(results) {
-    var tableBody = document.querySelector('#resultTable tbody');
-    tableBody.innerHTML = ''; // Clear existing rows
-    console.log(results)
+            const dl = document.createElement("dl");
+            dl.classList.add("row");
 
-    // Add new rows based on search results
-    //results.forEach(function (result) {
-    //  var row = '<tr><th scope="row">' + result.id + '</th><td>' + result.result + '</td></tr>';
-    //  tableBody.innerHTML += row;
-    //});
+            for (const key in appointment) {
+                const dt = document.createElement("dt");
+                dt.classList.add("col-sm-6","text-left");
+                temp = key
+                temp = capitalizeFirstLetter(temp)
+                dt.textContent = temp.replace('_', ' ');
+
+                const dd = document.createElement("dd");
+                dd.classList.add("col-sm-6","text-left");
+                dd.textContent = appointment[key];
+
+                dl.appendChild(dt);
+
+                const hr = document.createElement("hr");
+                hr.classList.add("hr");
+                dl.appendChild(hr);
+
+                dl.appendChild(dd);
+            }
+
+            appointmentDetails.appendChild(dl);
+        document.getElementById('appointmentDetailsCard').style.display = 'block';
+        }
 
 
-    // Display the table
-    document.getElementById('resultTable').style.display = 'table';
-  }
+
 </script>
 
 
