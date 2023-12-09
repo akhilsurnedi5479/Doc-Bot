@@ -332,66 +332,76 @@ def generate_numeric_id():
     # Generate a random 8-digit number
     return uuid.uuid4().int % 100000000
 
-def make_a_booking(doctor_id, patient_name, patient_email, patient_age, patient_gender, booking_timing):
-    # Generate an 8-digit numeric booking ID
-    booking_id = generate_numeric_id()
-
-    # Read doctors data from doctors.json
-    with open('data/doctors.json', 'r') as file:
-        doctors_data = json.load(file)
-
-    # Find the doctor with the specified ID
-    doctor_found = False
-    for doctor in doctors_data['doctors']:
-        if doctor['id'] == doctor_id:
-            doctor_name = doctor["name"]
-            doctor_found = True
-            # Extract available timings from the doctor's schedule
-            available_timings = doctor['schedule']
-            print(available_timings)
-            # Remove the booked timing from available timings
-            available_timings.pop(booking_timing.split()[0].lower(), None)
-            # Update the doctor's schedule
-            doctor['schedule'] = available_timings
-            print(available_timings)
-            break
-
-    # If the doctor was not found, return None
-    if not doctor_found:
+def read_json_file(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+        return data
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+        return None
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON in {file_path}: {e}")
         return None
 
-    # Create a dictionary for the booking
-    booking_data = {
+
+def write_json_file(file_path, data):
+    try:
+        with open(file_path, 'w') as file:
+            json.dump(data, file, indent=2)
+        print(f"Data written to {file_path}")
+    except Exception as e:
+        print(f"Error writing to {file_path}: {e}")
+
+def make_a_booking(doctor_name, patient_name, patient_email, patient_age, patient_gender, selected_day, selected_time):
+    doctor_file_path = "data/doctors.json"
+    bookings_file_path = "data/bookings.json"
+    # Load doctor data from the JSON file
+    booking_id = generate_numeric_id()
+    doctor_data = read_json_file(doctor_file_path)
+
+
+    if not doctor_data:
+        return
+
+    schedule = doctor_data.get("schedule", {})
+
+    if selected_day.lower() not in schedule:
+        print("Invalid day selection.")
+        return
+
+    selected_day_schedule = schedule[selected_day.lower()]
+
+    if selected_time not in selected_day_schedule:
+        print("Invalid time selection.")
+        return
+
+    print(f"Appointment scheduled with {doctor_name} on {selected_day.capitalize()} at {selected_time}.")
+
+    # Remove the selected time from the schedule
+    selected_day_schedule.remove(selected_time)
+
+    # Update the doctor JSON file with the modified schedule
+    write_json_file(doctor_file_path, doctor_data)
+
+    # Add booking details to the bookings JSON file
+    booking_details = {
         "booking_id": booking_id,
         "doctor_name": doctor_name,
-        "patient_name": patient_name,
+        "patient_name":patient_name,
         "patient_email": patient_email,
         "patient_age": patient_age,
         "patient_gender": patient_gender,
-        "booking_timing": booking_timing
+        "appointment_day": selected_day.capitalize(),
+        "appointment_time": selected_time
     }
 
-    # Read existing bookings from the JSON file
-    try:
-        with open('data/bookings.json', 'r') as file:
-            bookings = json.load(file)
-    except FileNotFoundError:
-        # If the file doesn't exist yet, create an empty list
-        bookings = []
+    existing_bookings = read_json_file(bookings_file_path) or []
+    existing_bookings.append(booking_details)
 
-    # Add the new booking to the list of bookings
-    bookings.append(booking_data)
-
-    # Write the updated list of bookings back to the JSON file
-    with open('data/bookings.json', 'w') as file:
-        json.dump(bookings, file, indent=4)
-
-    # Write the updated doctors data back to doctors.json
-    with open('data/doctors.json', 'w') as file:
-        json.dump(doctors_data, file, indent=4)
+    write_json_file(bookings_file_path, existing_bookings)
 
     return booking_id
-
 def get_booking_by_id(booking_id):
     try:
         with open('data/bookings.json', 'r') as file:
@@ -403,8 +413,32 @@ def get_booking_by_id(booking_id):
         print("Error: The 'bookings.json' file was not found.")
     return None
 
+def modify_schedule_as_string(schedule):
+    modified_string = ""
+
+    for day, timings in schedule["schedule"].items():
+        modified_string += f"{day.capitalize()}:<br>\n"
+        if timings:
+            for time in timings:
+                modified_string += f"  - {time}<br>\n"
+        else:
+            modified_string += "  - No available times<br>\n"
+
+    return modified_string
+
+
 def get_available_schedule():
-    return 0
+    doctor_file_path = "data/doctors.json"
+    doctor_data = read_json_file(doctor_file_path)
+    if not doctor_data:
+        return
+
+
+
+    #doctor_schedule = doctor_data.get("schedule", {})
+    modified_schedule_string = modify_schedule_as_string(doctor_data)
+
+    return modified_schedule_string
 
 
 @app.route('/process_data', methods=['POST'])
@@ -742,25 +776,39 @@ def get_bot_response():
 
         #session['step'] = 'FINAL'
         if s.lower() == "yes":
+            booking_day = ""
+            booking_time = ""
+
             session['step'] = "SCHEDULE_SENT_TO_USER"
             schedule_available = get_available_schedule()
+
             #get_available_schedule()
-            return "the available timings are:......Select the one you meant...select '0'"
+            return "the available timings are:......Select the one you meant...<br>select '0'<br>"+str(schedule_available)
         else:
             session['step'] = 'FINAL'
 
     if session['step'] == "SCHEDULE_SENT_TO_USER":
-        session['step'] = 'FINAL'
-        if(int(s) == 0):
+        session['step'] = "FINAL"
+        #if(int(s) == 0):
+        schedule_string =  s
+        words = schedule_string.split()
+
+        # Assuming the day is the first word and the time is the second word
+        day = words[0]
+        time = words[1] + " " + words[2]
+
+        print("Day:", day)
+        print("Time:", time)
         #make a booking for schedule 0
-            doctor_id = 1
-            patient_name = session["name"]
-            patient_email = session["email"]
-            patient_age = session["age"]
-            patient_gender = session["gender"]
-            booking_timing = "wednesday: 1:00 PM - 5:00 PM"
-            booking_id = make_a_booking(doctor_id, patient_name, patient_email, patient_age,patient_gender,booking_timing)
-        return "Your booking has been made. Please note your booking id"+str(booking_id)
+        doctor_name = "Dr. John Smith"
+        patient_name = session["name"]
+        patient_email = session["email"]
+        patient_age = session["age"]
+        patient_gender = session["gender"]
+        booking_day = day
+        booking_time =time
+        booking_id = make_a_booking(doctor_name, patient_name, patient_email, patient_age,patient_gender,booking_day,booking_time)
+        return "Your booking has been made. Please note your booking id: "+str(booking_id)
 
 
     # #Code change END

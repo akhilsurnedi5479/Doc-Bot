@@ -148,5 +148,7 @@
   
   .msger-chat {
     background-color: #fcfcfe;
-    background-image: url("testt.jpg")
+    background-image: url("back.jpg");
+    background-repeat: no-repeat;
+
   }
