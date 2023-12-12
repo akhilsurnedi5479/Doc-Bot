@@ -841,4 +841,4 @@ if __name__ == "__main__":
     ran = ''.join(random.choices(string.ascii_uppercase + string.digits, k=S))
     # chat_sp()
     app.secret_key = str(ran)
-    app.run()
+    app.run(host="0.0.0.0")
