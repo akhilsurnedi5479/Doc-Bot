@@ -677,6 +677,7 @@ def get_bot_response():
         print(session["diseases"])
         all_sym = session["all"]
         diseases = session["diseases"]
+        print("Diseases : " ,diseases)
         dis = diseases[0]
         session["dis"] = dis
         session['step'] = "for_dis"
