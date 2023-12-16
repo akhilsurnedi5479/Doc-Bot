@@ -674,8 +674,7 @@ def get_bot_response():
             session["all"] = [col_dict[psym1], col_dict[psym2]]
             print(session["all"])
         session["diseases"] = possible_diseases(session["all"])
-        print(session["diseases"])
-        all_sym = session["all"]
+        print("session: ",session["diseases"])
         diseases = session["diseases"]
         print("Diseases : " ,diseases)
         dis = diseases[0]

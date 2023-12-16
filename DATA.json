@@ -1,1 +1,15 @@
-{"users": []}
+{
+    "users": [
+        {
+            "Name": "Akhil",
+            "Age": 26,
+            "Gender": "Male",
+            "Disease": "Fungal infection",
+            "Sympts": [
+                "itching",
+                "dischromic _patches",
+                "skin_rash"
+            ]
+        }
+    ]
+}
